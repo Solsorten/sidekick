@@ -27,7 +27,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .topbar-sub{font-size:12px;color:var(--text3);margin-top:2px;}
 .topbar-dot{width:14px;height:14px;border-radius:50%;background:var(--gray);transition:background 0.3s;}
 .nav{display:flex;border-bottom:0.5px solid var(--border);}
-.nav button{flex:1;padding:11px 2px;font-size:11px;border:none;background:none;color:var(--text3);cursor:pointer;border-bottom:2px solid transparent;font-family:inherit;}
+.nav button{flex:1;padding:11px 2px;font-size:12px;border:none;background:none;color:var(--text3);cursor:pointer;border-bottom:2px solid transparent;font-family:inherit;}
 .nav button.active{color:var(--text);border-bottom-color:var(--text);font-weight:600;}
 .view{display:none;padding:20px;padding-bottom:60px;}
 .view.active{display:block;}
@@ -56,6 +56,7 @@ input[type=date]{font-size:15px;font-weight:400;}
 .btn:active{opacity:0.6;}
 .btn.primary{background:var(--text);color:var(--bg);border-color:var(--text);}
 .btn.danger{background:none;color:var(--red);border-color:rgba(226,75,74,0.25);}
+.clip-card{border-radius:var(--radius-lg);border:0.5px solid var(--border);padding:14px 16px;background:var(--bg2);margin-bottom:16px;font-size:13px;color:var(--text2);line-height:1.7;font-family:monospace;word-break:break-word;white-space:pre-wrap;}
 .race-card{border-radius:var(--radius-lg);border:0.5px solid var(--border);padding:16px;margin-bottom:12px;}
 .race-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px;}
 .race-name{font-size:15px;font-weight:600;}
@@ -81,25 +82,6 @@ input[type=date]{font-size:15px;font-weight:400;}
 .debug{font-size:11px;color:var(--text3);margin-bottom:10px;}
 .toast{position:fixed;bottom:32px;left:50%;transform:translateX(-50%);background:var(--text);color:var(--bg);padding:10px 22px;border-radius:22px;font-size:13px;font-weight:500;opacity:0;transition:opacity 0.2s;pointer-events:none;z-index:999;white-space:nowrap;}
 .toast.show{opacity:1;}
-
-/* Chat styles */
-#view-chat{display:none;flex-direction:column;padding:0;height:calc(100vh - 97px);}
-#view-chat.active{display:flex;}
-.chat-context{background:var(--bg2);border-bottom:0.5px solid var(--border);padding:10px 16px;font-size:11px;color:var(--text3);line-height:1.5;}
-.chat-messages{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:12px;}
-.msg{max-width:88%;padding:10px 14px;border-radius:14px;font-size:14px;line-height:1.6;}
-.msg.user{align-self:flex-end;background:var(--text);color:var(--bg);border-bottom-right-radius:4px;}
-.msg.assistant{align-self:flex-start;background:var(--bg2);color:var(--text);border-bottom-left-radius:4px;border:0.5px solid var(--border);}
-.msg.thinking{align-self:flex-start;background:var(--bg2);color:var(--text3);border:0.5px solid var(--border);border-bottom-left-radius:4px;font-style:italic;font-size:13px;}
-.chat-input-area{padding:12px 16px;border-top:0.5px solid var(--border);display:flex;gap:8px;align-items:flex-end;background:var(--bg);}
-.chat-input-area textarea{flex:1;padding:10px 14px;font-size:15px;font-family:inherit;border:0.5px solid var(--border);border-radius:20px;background:var(--bg2);color:var(--text);outline:none;resize:none;max-height:100px;line-height:1.4;}
-.chat-input-area textarea:focus{border-color:var(--text);background:var(--bg);}
-.send-btn{width:38px;height:38px;border-radius:50%;background:var(--text);color:var(--bg);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:16px;transition:opacity 0.15s;}
-.send-btn:active{opacity:0.7;}
-.send-btn:disabled{opacity:0.3;}
-.chat-quick{display:flex;gap:6px;padding:8px 16px 0;flex-wrap:wrap;}
-.quick-btn{padding:6px 12px;font-size:12px;border-radius:16px;border:0.5px solid var(--border);background:var(--bg2);color:var(--text2);cursor:pointer;font-family:inherit;white-space:nowrap;}
-.quick-btn:active{opacity:0.6;}
 </style>
 </head>
 <body>
@@ -117,7 +99,6 @@ input[type=date]{font-size:15px;font-weight:400;}
   <button onclick="showView('trends',this)">Trends</button>
   <button onclick="showView('races',this)">Races</button>
   <button onclick="showView('log',this)">Log</button>
-  <button onclick="showView('chat',this)">Chat</button>
 </div>
 
 <!-- CHECK-IN -->
@@ -149,13 +130,32 @@ input[type=date]{font-size:15px;font-weight:400;}
       <div class="input-hint">1 easy — 10 max</div>
     </div>
   </div>
+
   <div id="warn-area"></div>
+
   <div class="metric-grid">
-    <div class="metric-card"><div class="metric-label">HRV vs baseline</div><div class="metric-value" id="m-delta">—</div><div class="metric-sub">62 baseline</div></div>
-    <div class="metric-card"><div class="metric-label">Load zone</div><div class="metric-value" id="m-zone">—</div><div class="metric-sub" id="m-zone-sub">—</div></div>
-    <div class="metric-card"><div class="metric-label">7-day trend</div><div class="metric-value" id="m-trend">—</div><div class="metric-sub" id="m-trend-sub">need 3+ days</div></div>
-    <div class="metric-card"><div class="metric-label">Days above 1.0</div><div class="metric-value" id="m-consec">—</div><div class="metric-sub" id="m-consec-sub">consecutive</div></div>
+    <div class="metric-card">
+      <div class="metric-label">HRV vs baseline</div>
+      <div class="metric-value" id="m-delta">—</div>
+      <div class="metric-sub" id="m-baseline-sub">64 baseline</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-label">Load zone</div>
+      <div class="metric-value" id="m-zone">—</div>
+      <div class="metric-sub" id="m-zone-sub">—</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-label">7-day trend</div>
+      <div class="metric-value" id="m-trend">—</div>
+      <div class="metric-sub" id="m-trend-sub">need 3+ days</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-label">Days above 1.0</div>
+      <div class="metric-value" id="m-consec">—</div>
+      <div class="metric-sub" id="m-consec-sub">consecutive</div>
+    </div>
   </div>
+
   <div class="status-card">
     <div class="status-header">
       <div class="status-dot" id="s-dot" style="background:var(--gray);"></div>
@@ -163,7 +163,12 @@ input[type=date]{font-size:15px;font-weight:400;}
     </div>
     <div class="status-text" id="s-text">Fill in today's HRV, load, and ratio to get your daily read.</div>
   </div>
-  <button class="btn primary" onclick="saveEntry()">Save today's entry</button>
+
+  <button class="btn primary" onclick="saveEntry()">Save &amp; copy to Claude</button>
+  <div id="clip-preview" style="display:none;">
+    <div style="font-size:12px;color:var(--text3);margin-bottom:8px;">Copied to clipboard — paste this into Claude:</div>
+    <div class="clip-card" id="clip-text"></div>
+  </div>
 </div>
 
 <!-- TRENDS -->
@@ -201,58 +206,30 @@ input[type=date]{font-size:15px;font-weight:400;}
   <button class="btn danger" onclick="clearAll()">Clear all data</button>
 </div>
 
-<!-- CHAT -->
-<div id="view-chat" class="view">
-  <div id="chat-setup" style="display:none;padding:20px;">
-    <div class="section-title">API key setup</div>
-    <p style="font-size:14px;color:var(--text2);line-height:1.6;margin-bottom:20px;">To use the Chat tab you need an Anthropic API key. It's stored only on this device — never in the code or on GitHub.</p>
-    <div style="font-size:13px;color:var(--text3);margin-bottom:8px;">Get your key at console.anthropic.com → API Keys → Create Key</div>
-    <input type="text" id="api-key-input" placeholder="sk-ant-api03-..." style="width:100%;padding:12px 14px;font-size:13px;font-family:inherit;border:0.5px solid var(--border);border-radius:var(--radius);background:var(--bg2);color:var(--text);outline:none;margin-bottom:12px;">
-    <button class="btn primary" onclick="submitApiKey()">Save key and start chatting</button>
-  </div>
-  <div id="chat-main" style="display:none;flex-direction:column;height:calc(100vh - 97px);">
-    <div class="chat-context" id="chat-context">Log today's numbers first to give me full context.</div>
-    <div class="chat-quick">
-      <button class="quick-btn" onclick="quickSend('What should I do today?')">Today's plan</button>
-      <button class="quick-btn" onclick="quickSend('How is my trend looking?')">Trend check</button>
-      <button class="quick-btn" onclick="quickSend('Am I on track for my marathon?')">Marathon ready?</button>
-      <button class="quick-btn" onclick="quickSend('Am I on track for Ironman?')">Ironman ready?</button>
-    </div>
-    <div class="chat-messages" id="chat-messages">
-      <div class="msg assistant">Hi — I'm your training sidekick. I know your full context: thalassemia minor, marathon May 10, Ironman August, LTHR 181. Ask me anything.</div>
-    </div>
-    <div class="chat-input-area">
-      <textarea id="chat-input" placeholder="Ask anything..." rows="1" onkeydown="handleKey(event)" oninput="autoResize(this)"></textarea>
-      <button class="send-btn" id="send-btn" onclick="sendMessage()">&#8593;</button>
-    </div>
-    <div style="text-align:center;padding:8px;"><button onclick="resetApiKey()" style="font-size:11px;color:var(--text3);background:none;border:none;cursor:pointer;">Change API key</button></div>
-  </div>
-</div>
-
 <div class="toast" id="toast"></div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <script>
 const DEFAULT_BASELINE=64, KEY='sidekick-pwa-v1';
-function getBaseline(entries){
-  if(!entries||entries.length<7)return DEFAULT_BASELINE;
-  const r30=entries.slice(-30);
-  return Math.round(r30.reduce((a,b)=>a+b.hrv,0)/r30.length);
-}
-function getApiKey(){return localStorage.getItem('sidekick-api-key')||'';}
-function saveApiKey(k){localStorage.setItem('sidekick-api-key',k.trim());}const RACES=[
+const RACES=[
   {name:'CPH Marathon',date:'2026-05-10',type:'marathon',goal:'Sub 3:00'},
   {name:'Sprint Triathlon',date:'2026-06-06',type:'sprint',goal:'Race sharp'},
   {name:'70.3 Triathlon',date:'2026-06-21',type:'70.3',goal:'Fitness check'},
   {name:'Ironman Full',date:'2026-08-16',type:'ironman',goal:'A race — finish strong'}
 ];
 let _e=null, hC=null, rC=null;
-let chatHistory=[];
 
 function load(){if(_e!==null)return _e;try{_e=JSON.parse(localStorage.getItem(KEY)||'[]');}catch(e){_e=[];}return _e;}
 function persist(e){_e=e;try{localStorage.setItem(KEY,JSON.stringify(e));return true;}catch(e){return false;}}
-function toast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2000);}
+function toast(m,dur){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),dur||2000);}
 function daysUntil(d){const n=new Date();n.setHours(0,0,0,0);const t=new Date(d);t.setHours(0,0,0,0);return Math.round((t-n)/86400000);}
+
+function getBaseline(entries){
+  if(!entries||entries.length<7)return DEFAULT_BASELINE;
+  const r30=entries.slice(-30);
+  return Math.round(r30.reduce((a,b)=>a+b.hrv,0)/r30.length);
+}
+
 function dc(h,r,bl){const b=bl||DEFAULT_BASELINE;if(r>1.3||h<b-8)return'#E24B4A';if(r>1.0||h<b-3)return'#EF9F27';return'#1D9E75';}
 function zone(r){if(r<0.8)return{l:'Under',s:'below 0.8'};if(r<=1.0)return{l:'Optimal',s:'0.8–1.0'};if(r<=1.3)return{l:'High',s:'monitor'};return{l:'Danger',s:'above 1.3'};}
 
@@ -274,8 +251,7 @@ function analyze(entries){
 }
 
 function getStatus(hrv,ratio,rpe,a){
-  const bl=a.baseline||DEFAULT_BASELINE;
-  const d=hrv-bl,{consec}=a;
+  const bl=a.baseline,d=hrv-bl,{consec}=a;
   if(ratio>1.3&&hrv<bl-5)return{c:'#E24B4A',ti:'Red — stop and recover',tx:`HRV ${Math.abs(d)} below baseline with danger-zone load. This is the winter pattern. Full rest — thalassemia minor means your recovery ceiling is lower than it looks.`};
   if(ratio>1.3||hrv<bl-8)return{c:'#E24B4A',ti:'Red — recovery day',tx:`${ratio>1.3?'Load ratio above 1.3.':'HRV significantly suppressed.'} Easy swim or full rest only.`};
   if(consec>=5)return{c:'#E24B4A',ti:'Red — trend is the problem',tx:`Today looks okay but ${consec} consecutive days above 1.0. That slow accumulation is how winter happened. Rest today.`};
@@ -289,8 +265,7 @@ function raceRec(race,a){
   const days=daysUntil(race.date);
   if(days<0)return'Race completed.';
   if(!a.ah)return'Log more entries to get personalised recommendations.';
-  const bl=a.baseline||DEFAULT_BASELINE;
-  const hOk=a.ah>=bl-3,lOk=a.ar<=1.1;
+  const bl=a.baseline,hOk=a.ah>=bl-3,lOk=a.ar<=1.1;
   if(race.type==='marathon'){if(days>14)return`${days} days out. ${hOk&&lOk?'HRV and load looking good — stay the course.':'Watch load carefully to arrive at taper healthy.'}`;return`Taper window. ${hOk?'HRV responding well — protect it.':'HRV below baseline — add a rest day.'} Target 70+ HRV race week.`;}
   if(race.type==='ironman'){if(days>60)return`${days} days out. Build bike after marathon recovery. Ramp test before heavy bike block.`;if(days>21)return`${days} days out. ${lOk?'Load manageable.':'Load creeping high — protect run legs.'} Dial in nutrition now.`;return`${days} days — taper. HRV ${hOk?'stable':'suppressed'}. ${hOk?'Trust the taper.':'Add a rest day immediately.'}`;}
   if(race.type==='70.3')return`${days} days out. Fitness check not A race. Ratio at or below 0.9 this week.`;
@@ -298,65 +273,29 @@ function raceRec(race,a){
   return`${days} days out. ${hOk&&lOk?'Looking good.':'Monitor load closely.'}`;
 }
 
-function inputs(){return{hrv:parseFloat(document.getElementById('f-hrv').value)||0,acute:parseFloat(document.getElementById('f-acute').value)||0,ratio:parseFloat(document.getElementById('f-ratio').value)||0,rpe:parseFloat(document.getElementById('f-rpe').value)||0};}
+function buildClipText(hrv,acute,ratio,rpe,a,date){
+  const bl=a.baseline,delta=hrv-bl;
+  const st=getStatus(hrv,ratio,rpe,a);
+  const warnings=a.warns.length?'\nWarnings: '+a.warns.map(w=>w.t).join(' | '):'';
+  const races=RACES.map(r=>{const d=daysUntil(r.date);return d>0?`${r.name}: ${d} days`:null;}).filter(Boolean).join(' · ');
+  const recent=load().slice(-5).map(e=>`${new Date(e.date).toLocaleDateString('en-DK',{month:'short',day:'numeric'})}: HRV ${e.hrv}, ratio ${e.ratio.toFixed(2)}, RPE ${e.rpe}`).join('\n');
 
-function buildSystemPrompt(){
-  const entries=load(),a=analyze(entries);
-  const recent=entries.slice(-7).map(e=>`${e.date}: HRV ${e.hrv}, ratio ${e.ratio.toFixed(2)}, RPE ${e.rpe}`).join(' | ');
-  const {hrv,acute,ratio,rpe}=inputs();
-  return `You are a personal training sidekick for an endurance athlete. Be direct, specific, and concise. No fluff.
+  return `[Sidekick update — ${new Date(date).toLocaleDateString('en-DK',{day:'numeric',month:'short'})}]
 
-ATHLETE PROFILE:
-- Age: 32, Vietnamese origin, living in Denmark
-- Weight: 58kg, Height: 171cm
-- Condition: Thalassemia minor (--αα) — slightly reduced oxygen carrying capacity, needs more recovery than average
-- LTHR: 181 bpm
-- Background: Started running Feb 2024, no prior endurance background
+Status: ${st.ti}
+HRV: ${hrv} (${delta>=0?'+':''}${delta} vs baseline ${bl})
+Acute load: ${acute} · Load ratio: ${ratio} · RPE: ${rpe}
+7-day HRV trend: ${a.t7!==null?(a.t7>=0?'+':'')+a.t7+' pts':'not enough data'}
+Consecutive days above 1.0: ${a.consec}
+Avg HRV (7d): ${a.ah?Math.round(a.ah):'—'} · Avg ratio (7d): ${a.ar?a.ar.toFixed(2):'—'}${warnings}
 
-RACE HISTORY:
-- Sep 2024: Half marathon 1:45
-- Apr 2025: Berlin Half 1:28
-- Jun 2025: Ironman 70.3 Elsinore 5:53
-- May 2025: CPH Marathon 3:03
-- Apr 2026: CPH Half 1:26
+Races: ${races}
 
-2026 RACE CALENDAR:
-- May 10: CPH Marathon (goal: sub 3:00) — ${daysUntil('2026-05-10')} days away
-- Jun 6: Sprint Triathlon — ${daysUntil('2026-06-06')} days away
-- Jun 21: 70.3 Triathlon — ${daysUntil('2026-06-21')} days away
-- Aug 16: Ironman Full (A race) — ${daysUntil('2026-08-16')} days away
-
-HRV BASELINE: ${getBaseline(entries)} (rolling 30-day average, default 64). Winter was low 50s. Current block mid 60s–70. Personal range 57-72.
-LOAD RATIO NORMAL RANGE: 0.8–1.2. Above 1.3 = danger zone.
-FATIGUE HISTORY: Went into deep fatigue twice in winter 2025/26 by training too hard in off-season.
-
-TODAY'S METRICS:
-- HRV: ${hrv||'not logged'} (baseline 62)
-- Acute load: ${acute||'not logged'}
-- Load ratio: ${ratio||'not logged'}
-- Yesterday RPE: ${rpe||'not logged'}
-
-RECENT 7-DAY LOG:
-${recent||'No entries yet'}
-
-TREND ANALYSIS:
-- 7-day HRV trend: ${a.t7!==null?(a.t7>=0?'+':'')+a.t7+' pts':'insufficient data'}
-- Consecutive days above 1.0 ratio: ${a.consec}
-- Avg HRV (7d): ${a.ah?Math.round(a.ah):'—'}
-- Avg ratio (7d): ${a.ar?a.ar.toFixed(2):'—'}
-${a.warns.length?'ACTIVE WARNINGS: '+a.warns.map(w=>w.t).join(' | '):'No active trend warnings.'}
-
-MARATHON CONTEXT (May 10):
-- Last long run: 30km with 10km at 4:21 (negative split 4:34→4:09)
-- Threshold pace: 3:55–4:03/km
-- Race goal pace: 4:15/km (sub 3:00)
-- Fueling plan: Maurten Gel 160, every 25 min, 7 gels total (~96g/hr)
-- Last year: faded at km 37 due to under-fueling (went through halfway in 1:30)
-- Dress rehearsal: 32km on Apr 25 with 12km at race pace
-- Taper: 2 weeks prior to race
-
-Keep responses conversational and under 150 words unless asked for detail. Always be honest, not just reassuring.`;
+Recent log:
+${recent||'No prior entries'}`;
 }
+
+function inputs(){return{hrv:parseFloat(document.getElementById('f-hrv').value)||0,acute:parseFloat(document.getElementById('f-acute').value)||0,ratio:parseFloat(document.getElementById('f-ratio').value)||0,rpe:parseFloat(document.getElementById('f-rpe').value)||0};}
 
 function updateCheckin(){
   const{hrv,ratio,rpe}=inputs();
@@ -364,7 +303,7 @@ function updateCheckin(){
   const entries=load(),a=analyze(entries),bl=a.baseline,delta=hrv-bl;
   document.getElementById('m-delta').textContent=(delta>=0?'+':'')+delta;
   document.getElementById('m-delta').style.color=delta>=3?'#1D9E75':delta<=-5?'#E24B4A':'var(--text)';
-  document.querySelector('#view-checkin .metric-card .metric-sub').textContent=`${bl} baseline`;
+  document.getElementById('m-baseline-sub').textContent=`${bl} baseline`;
   const z=zone(ratio);
   document.getElementById('m-zone').textContent=z.l;document.getElementById('m-zone-sub').textContent=z.s;
   document.getElementById('m-consec').textContent=a.consec;document.getElementById('m-consec-sub').textContent=a.consec>=3?'watch this':a.consec===0?'none':'days';
@@ -372,26 +311,13 @@ function updateCheckin(){
   const st=getStatus(hrv,ratio,rpe,a);
   document.getElementById('s-dot').style.background=st.c;document.getElementById('s-title').textContent=st.ti;document.getElementById('s-text').textContent=st.tx;
   document.getElementById('top-dot').style.background=st.c;
-  document.getElementById('top-sub').textContent=`${entries.length} entr${entries.length===1?'y':'ies'} · ${new Date().toLocaleDateString('en-DK',{month:'short',day:'numeric'})}`;
+  document.getElementById('top-sub').textContent=`${load().length} entries · ${new Date().toLocaleDateString('en-DK',{month:'short',day:'numeric'})}`;
   document.getElementById('warn-area').innerHTML=a.warns.map(w=>{const r=w.l==='red';return`<div class="warn-box" style="background:${r?'rgba(226,75,74,0.08)':'rgba(239,159,39,0.08)'};border-color:${r?'rgba(226,75,74,0.3)':'rgba(239,159,39,0.3)'};color:${r?'#993C1D':'#854F0B'};">Trend alert — ${w.t}</div>`;}).join('');
-  updateChatContext();
-}
-
-function updateChatContext(){
-  const{hrv,ratio,rpe}=inputs();
-  const entries=load(),a=analyze(entries),bl=a.baseline;
-  const ctx=document.getElementById('chat-context');
-  if(hrv&&ratio){
-    const st=getStatus(hrv,ratio,rpe,a);
-    ctx.innerHTML=`Today: HRV <strong>${hrv}</strong> (${hrv-bl>=0?'+':''}${hrv-bl} vs baseline ${bl}) · Ratio <strong>${ratio}</strong> · <span style="color:${st.c};font-weight:600;">${st.ti.split('—')[0].trim()}</span>`;
-  }else{
-    ctx.textContent='Log today\'s numbers in Check-in to give me full context.';
-  }
 }
 
 function renderTrends(){
   const entries=load(),a=analyze(entries),r30=entries.slice(-30);
-  document.getElementById('streak-dots').innerHTML=entries.slice(-14).map(e=>{const c=dc(e.hrv,e.ratio),d=new Date(e.date),day=d.toLocaleDateString('en-DK',{weekday:'short'}).slice(0,2);return`<div class="streak-dot" style="background:${c}22;color:${c};border:1.5px solid ${c};">${day}</div>`;}).join('');
+  document.getElementById('streak-dots').innerHTML=entries.slice(-14).map(e=>{const c=dc(e.hrv,e.ratio,a.baseline),d=new Date(e.date),day=d.toLocaleDateString('en-DK',{weekday:'short'}).slice(0,2);return`<div class="streak-dot" style="background:${c}22;color:${c};border:1.5px solid ${c};">${day}</div>`;}).join('');
   if(a.ah){document.getElementById('t-hrv').textContent=Math.round(a.ah);document.getElementById('t-hrv-sub').textContent=a.ah>=a.baseline?'above baseline':'below baseline';document.getElementById('t-ratio').textContent=a.ar.toFixed(2);document.getElementById('t-ratio-sub').textContent=a.ar<=1.0?'optimal':'above optimal';document.getElementById('t-red').textContent=a.red;}
   if(a.t7!==null)document.getElementById('t-dir').textContent=(a.t7>=0?'+':'')+a.t7;
   const ins=document.getElementById('trend-insights');
@@ -399,7 +325,6 @@ function renderTrends(){
   if(hC){hC.destroy();hC=null;}if(rC){rC.destroy();rC=null;}
   if(r30.length>=2){
     const labels=r30.map(e=>new Date(e.date).toLocaleDateString('en-DK',{month:'short',day:'numeric'})),hd=r30.map(e=>e.hrv),rd=r30.map(e=>e.ratio),dcs=r30.map(e=>dc(e.hrv,e.ratio,a.baseline));
-    hC=new Chart(document.getElementById('hrv-chart').getContext('2d'),{type:'line',data:{labels,datasets:[{label:'HRV',data:hd,borderColor:'#1D9E75',backgroundColor:'rgba(29,158,117,0.07)',borderWidth:2,pointBackgroundColor:dcs,pointRadius:4,tension:0.3,fill:true},{label:'Baseline',data:Array(labels.length).fill(a.baseline),borderColor:'#888780',borderWidth:1,borderDash:[4,4],pointRadius:0}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{maxTicksLimit:5,color:'#888780',font:{size:10}},grid:{display:false}},y:{min:40,max:90,ticks:{color:'#888780',font:{size:10}},grid:{color:'rgba(136,135,128,0.1)'}}}}});
     hC=new Chart(document.getElementById('hrv-chart').getContext('2d'),{type:'line',data:{labels,datasets:[{label:'HRV',data:hd,borderColor:'#1D9E75',backgroundColor:'rgba(29,158,117,0.07)',borderWidth:2,pointBackgroundColor:dcs,pointRadius:4,tension:0.3,fill:true},{label:'Baseline',data:Array(labels.length).fill(a.baseline),borderColor:'#888780',borderWidth:1,borderDash:[4,4],pointRadius:0}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{maxTicksLimit:5,color:'#888780',font:{size:10}},grid:{display:false}},y:{min:40,max:90,ticks:{color:'#888780',font:{size:10}},grid:{color:'rgba(136,135,128,0.1)'}}}}});
     rC=new Chart(document.getElementById('ratio-chart').getContext('2d'),{type:'bar',data:{labels,datasets:[{label:'Ratio',data:rd,backgroundColor:rd.map(r=>r>1.3?'#E24B4A':r>1.0?'#EF9F27':'#1D9E75'),borderRadius:3}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{maxTicksLimit:5,color:'#888780',font:{size:10}},grid:{display:false}},y:{min:0,max:1.8,ticks:{color:'#888780',font:{size:10}},grid:{color:'rgba(136,135,128,0.1)'}}}}});
   }else{document.getElementById('hrv-chart').parentElement.innerHTML='<div class="empty">Log 2+ entries to see charts.</div>';document.getElementById('ratio-chart').parentElement.innerHTML='';}
@@ -425,7 +350,6 @@ function showView(name,btn){
   if(name==='trends')renderTrends();
   if(name==='races')renderRaces();
   if(name==='log')renderLog();
-  if(name==='chat')showChatView();
 }
 
 function saveEntry(){
@@ -436,99 +360,24 @@ function saveEntry(){
   const entries=load(),idx=entries.findIndex(e=>e.date===date),entry={date,hrv,acute,ratio,rpe};
   if(idx>=0)entries[idx]=entry;else entries.push(entry);
   entries.sort((a,b)=>a.date.localeCompare(b.date));
-  persist(entries)?toast('Saved'):toast('Save failed');
+  persist(entries);
   updateCheckin();
+
+  const a=analyze(entries);
+  const clipText=buildClipText(hrv,acute,ratio,rpe,a,date);
+
+  navigator.clipboard.writeText(clipText).then(()=>{
+    toast('Saved + copied to clipboard',2500);
+  }).catch(()=>{
+    toast('Saved — copy manually below',2500);
+  });
+
+  document.getElementById('clip-text').textContent=clipText;
+  document.getElementById('clip-preview').style.display='block';
 }
 
 function clearAll(){
   if(confirm('Clear all stored entries?')){_e=[];localStorage.removeItem(KEY);updateCheckin();renderLog();toast('Cleared');}
-}
-
-function showChatView(){
-  const hasKey = getApiKey().length > 0;
-  document.getElementById('chat-setup').style.display = hasKey ? 'none' : 'block';
-  document.getElementById('chat-main').style.display = hasKey ? 'flex' : 'none';
-  if(hasKey) updateChatContext();
-}
-function submitApiKey(){
-  const val = document.getElementById('api-key-input').value.trim();
-  if(!val.startsWith('sk-ant')){toast('Key should start with sk-ant...');return;}
-  saveApiKey(val);
-  showChatView();
-  toast('Key saved');
-}
-function resetApiKey(){
-  localStorage.removeItem('sidekick-api-key');
-  document.getElementById('api-key-input').value='';
-  showChatView();
-}
-function autoResize(el){el.style.height='auto';el.style.height=Math.min(el.scrollHeight,100)+'px';}
-function handleKey(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendMessage();}}
-function quickSend(msg){document.getElementById('chat-input').value=msg;sendMessage();}
-
-function addMessage(role,text){
-  const el=document.getElementById('chat-messages');
-  const div=document.createElement('div');
-  div.className=`msg ${role}`;
-  div.textContent=text;
-  el.appendChild(div);
-  el.scrollTop=el.scrollHeight;
-  return div;
-}
-
-async function sendMessage(){
-  const input=document.getElementById('chat-input');
-  const btn=document.getElementById('send-btn');
-  const text=input.value.trim();
-  if(!text)return;
-
-  input.value='';
-  input.style.height='auto';
-  btn.disabled=true;
-
-  addMessage('user',text);
-  chatHistory.push({role:'user',content:text});
-
-  const thinking=addMessage('thinking','Thinking...');
-
-  try{
-    const res=await fetch('https://api.anthropic.com/v1/messages',{
-      method:'POST',
-      headers:{
-        'Content-Type':'application/json',
-        'x-api-key':getApiKey(),
-        'anthropic-version':'2023-06-01',
-        'anthropic-dangerous-direct-browser-access':'true'
-      },
-      body:JSON.stringify({
-        model:'claude-haiku-4-5-20251001',
-        max_tokens:400,
-        system:buildSystemPrompt(),
-        messages:chatHistory
-      })
-    });
-
-    const data=await res.json();
-
-    if(data.error){
-      thinking.className='msg assistant';
-      thinking.textContent='Error: '+data.error.message;
-      chatHistory.pop();
-    }else{
-      const reply=data.content[0].text;
-      thinking.className='msg assistant';
-      thinking.textContent=reply;
-      chatHistory.push({role:'assistant',content:reply});
-      if(chatHistory.length>20)chatHistory=chatHistory.slice(-20);
-    }
-  }catch(e){
-    thinking.className='msg assistant';
-    thinking.textContent='Could not reach the API. Check your connection.';
-    chatHistory.pop();
-  }
-
-  btn.disabled=false;
-  document.getElementById('chat-messages').scrollTop=document.getElementById('chat-messages').scrollHeight;
 }
 
 document.getElementById('entry-date').value=new Date().toISOString().split('T')[0];
