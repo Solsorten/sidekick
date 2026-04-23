@@ -12,84 +12,94 @@
 <title>Training Sidekick</title>
 <style>
 :root {
-  --green: #1D9E75; --amber: #EF9F27; --red: #E24B4A; --gray: #888780;
-  --bg: #ffffff; --bg2: #f5f5f3; --bg3: #eeede9;
-  --text: #1a1a18; --text2: #5f5e5a; --text3: #888780;
-  --border: rgba(0,0,0,0.12); --radius: 10px; --radius-lg: 14px;
+  --green:#1D9E75;--amber:#EF9F27;--red:#E24B4A;--gray:#888780;
+  --bg:#ffffff;--bg2:#f5f5f3;--bg3:#eeede9;
+  --text:#1a1a18;--text2:#5f5e5a;--text3:#888780;
+  --border:rgba(0,0,0,0.12);--radius:10px;--radius-lg:14px;
 }
-@media (prefers-color-scheme: dark) {
-  :root {
-    --bg: #1a1a18; --bg2: #242422; --bg3: #2c2c2a;
-    --text: #f0efe9; --text2: #b4b2a9; --text3: #5f5e5a;
-    --border: rgba(255,255,255,0.1);
-  }
+@media(prefers-color-scheme:dark){
+  :root{--bg:#1a1a18;--bg2:#242422;--bg3:#2c2c2a;--text:#f0efe9;--text2:#b4b2a9;--text3:#5f5e5a;--border:rgba(255,255,255,0.1);}
 }
-* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; max-width: 430px; margin: 0 auto; }
-.topbar { display: flex; align-items: center; justify-content: space-between; padding: 16px 20px 12px; border-bottom: 0.5px solid var(--border); }
-.topbar-title { font-size: 17px; font-weight: 600; }
-.topbar-sub { font-size: 12px; color: var(--text3); margin-top: 2px; }
-.topbar-dot { width: 14px; height: 14px; border-radius: 50%; background: var(--gray); transition: background 0.3s; }
-.nav { display: flex; border-bottom: 0.5px solid var(--border); }
-.nav button { flex: 1; padding: 11px 4px; font-size: 12px; border: none; background: none; color: var(--text3); cursor: pointer; border-bottom: 2px solid transparent; font-family: inherit; }
-.nav button.active { color: var(--text); border-bottom-color: var(--text); font-weight: 600; }
-.view { display: none; padding: 20px; padding-bottom: 60px; }
-.view.active { display: block; }
-.section-title { font-size: 11px; font-weight: 600; color: var(--text3); text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 16px; }
-.input-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px; }
-.input-group { display: flex; flex-direction: column; gap: 6px; }
-.input-group.full { grid-column: 1 / -1; }
-.input-label { font-size: 12px; color: var(--text3); font-weight: 500; }
-.input-hint { font-size: 11px; color: var(--text3); }
-input[type=number], input[type=date] {
-  width: 100%; padding: 12px 14px; font-size: 22px; font-weight: 700;
-  font-family: inherit; border: 0.5px solid var(--border); border-radius: var(--radius);
-  background: var(--bg2); color: var(--text); outline: none; -moz-appearance: textfield;
-}
-input[type=number]::-webkit-inner-spin-button,
-input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; }
-input[type=number]:focus, input[type=date]:focus { border-color: var(--text); background: var(--bg); }
-input[type=date] { font-size: 15px; font-weight: 400; }
-.metric-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
-.metric-card { background: var(--bg2); border-radius: var(--radius); padding: 12px 14px; }
-.metric-label { font-size: 11px; color: var(--text3); margin-bottom: 4px; }
-.metric-value { font-size: 24px; font-weight: 700; }
-.metric-sub { font-size: 11px; color: var(--text3); margin-top: 2px; }
-.status-card { border-radius: var(--radius-lg); border: 0.5px solid var(--border); padding: 16px; background: var(--bg); margin-bottom: 20px; }
-.status-header { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
-.status-dot { width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; transition: background 0.3s; }
-.status-title { font-size: 15px; font-weight: 600; }
-.status-text { font-size: 13px; color: var(--text2); line-height: 1.65; }
-.warn-box { border-radius: var(--radius); padding: 12px 14px; font-size: 13px; line-height: 1.5; margin-bottom: 12px; border: 0.5px solid; }
-.btn { width: 100%; padding: 15px; font-size: 16px; font-weight: 500; border-radius: var(--radius-lg); border: 0.5px solid var(--border); background: var(--bg2); color: var(--text); cursor: pointer; margin-bottom: 10px; font-family: inherit; transition: opacity 0.15s; }
-.btn:active { opacity: 0.6; }
-.btn.primary { background: var(--text); color: var(--bg); border-color: var(--text); }
-.btn.danger { background: none; color: var(--red); border-color: rgba(226,75,74,0.25); }
-.race-card { border-radius: var(--radius-lg); border: 0.5px solid var(--border); padding: 16px; margin-bottom: 12px; }
-.race-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
-.race-name { font-size: 15px; font-weight: 600; }
-.race-meta { font-size: 12px; color: var(--text3); margin-top: 3px; }
-.race-days-num { font-size: 30px; font-weight: 700; line-height: 1; }
-.race-days-lbl { font-size: 11px; color: var(--text3); margin-top: 2px; }
-.race-rec { font-size: 13px; color: var(--text2); line-height: 1.6; padding-top: 12px; border-top: 0.5px solid var(--border); }
-.hist-row { display: flex; align-items: center; gap: 10px; padding: 11px 0; border-bottom: 0.5px solid var(--border); }
-.hist-dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
-.hist-date { font-size: 13px; color: var(--text3); width: 72px; flex-shrink: 0; }
-.hist-meta { font-size: 12px; color: var(--text2); flex: 1; line-height: 1.4; }
-.hist-hrv { font-size: 15px; font-weight: 700; min-width: 28px; text-align: right; }
-.bar-wrap { width: 48px; height: 4px; background: var(--bg3); border-radius: 2px; }
-.bar-fill { height: 4px; border-radius: 2px; }
-.streak-wrap { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 20px; }
-.streak-dot { width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 9px; font-weight: 700; }
-.chart-wrap { position: relative; width: 100%; margin-bottom: 20px; }
-.legend { display: flex; gap: 16px; margin-bottom: 10px; }
-.legend-item { display: flex; align-items: center; gap: 5px; font-size: 11px; color: var(--text3); }
-.legend-dot { width: 8px; height: 8px; border-radius: 50%; }
-.empty { text-align: center; padding: 40px 20px; color: var(--text3); font-size: 14px; line-height: 1.6; }
-.divider { border: none; border-top: 0.5px solid var(--border); margin: 20px 0; }
-.debug { font-size: 11px; color: var(--text3); margin-bottom: 10px; }
-.toast { position: fixed; bottom: 32px; left: 50%; transform: translateX(-50%); background: var(--text); color: var(--bg); padding: 10px 22px; border-radius: 22px; font-size: 13px; font-weight: 500; opacity: 0; transition: opacity 0.2s; pointer-events: none; z-index: 999; white-space: nowrap; }
-.toast.show { opacity: 1; }
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;max-width:430px;margin:0 auto;}
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:16px 20px 12px;border-bottom:0.5px solid var(--border);}
+.topbar-title{font-size:17px;font-weight:600;}
+.topbar-sub{font-size:12px;color:var(--text3);margin-top:2px;}
+.topbar-dot{width:14px;height:14px;border-radius:50%;background:var(--gray);transition:background 0.3s;}
+.nav{display:flex;border-bottom:0.5px solid var(--border);}
+.nav button{flex:1;padding:11px 2px;font-size:11px;border:none;background:none;color:var(--text3);cursor:pointer;border-bottom:2px solid transparent;font-family:inherit;}
+.nav button.active{color:var(--text);border-bottom-color:var(--text);font-weight:600;}
+.view{display:none;padding:20px;padding-bottom:60px;}
+.view.active{display:block;}
+.section-title{font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.07em;margin-bottom:16px;}
+.input-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px;}
+.input-group{display:flex;flex-direction:column;gap:6px;}
+.input-group.full{grid-column:1/-1;}
+.input-label{font-size:12px;color:var(--text3);font-weight:500;}
+.input-hint{font-size:11px;color:var(--text3);}
+input[type=number],input[type=date]{width:100%;padding:12px 14px;font-size:22px;font-weight:700;font-family:inherit;border:0.5px solid var(--border);border-radius:var(--radius);background:var(--bg2);color:var(--text);outline:none;-moz-appearance:textfield;}
+input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none;}
+input[type=number]:focus,input[type=date]:focus{border-color:var(--text);background:var(--bg);}
+input[type=date]{font-size:15px;font-weight:400;}
+.metric-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px;}
+.metric-card{background:var(--bg2);border-radius:var(--radius);padding:12px 14px;}
+.metric-label{font-size:11px;color:var(--text3);margin-bottom:4px;}
+.metric-value{font-size:24px;font-weight:700;}
+.metric-sub{font-size:11px;color:var(--text3);margin-top:2px;}
+.status-card{border-radius:var(--radius-lg);border:0.5px solid var(--border);padding:16px;background:var(--bg);margin-bottom:20px;}
+.status-header{display:flex;align-items:center;gap:10px;margin-bottom:8px;}
+.status-dot{width:12px;height:12px;border-radius:50%;flex-shrink:0;transition:background 0.3s;}
+.status-title{font-size:15px;font-weight:600;}
+.status-text{font-size:13px;color:var(--text2);line-height:1.65;}
+.warn-box{border-radius:var(--radius);padding:12px 14px;font-size:13px;line-height:1.5;margin-bottom:12px;border:0.5px solid;}
+.btn{width:100%;padding:15px;font-size:16px;font-weight:500;border-radius:var(--radius-lg);border:0.5px solid var(--border);background:var(--bg2);color:var(--text);cursor:pointer;margin-bottom:10px;font-family:inherit;transition:opacity 0.15s;}
+.btn:active{opacity:0.6;}
+.btn.primary{background:var(--text);color:var(--bg);border-color:var(--text);}
+.btn.danger{background:none;color:var(--red);border-color:rgba(226,75,74,0.25);}
+.race-card{border-radius:var(--radius-lg);border:0.5px solid var(--border);padding:16px;margin-bottom:12px;}
+.race-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px;}
+.race-name{font-size:15px;font-weight:600;}
+.race-meta{font-size:12px;color:var(--text3);margin-top:3px;}
+.race-days-num{font-size:30px;font-weight:700;line-height:1;}
+.race-days-lbl{font-size:11px;color:var(--text3);margin-top:2px;}
+.race-rec{font-size:13px;color:var(--text2);line-height:1.6;padding-top:12px;border-top:0.5px solid var(--border);}
+.hist-row{display:flex;align-items:center;gap:10px;padding:11px 0;border-bottom:0.5px solid var(--border);}
+.hist-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0;}
+.hist-date{font-size:13px;color:var(--text3);width:72px;flex-shrink:0;}
+.hist-meta{font-size:12px;color:var(--text2);flex:1;line-height:1.4;}
+.hist-hrv{font-size:15px;font-weight:700;min-width:28px;text-align:right;}
+.bar-wrap{width:48px;height:4px;background:var(--bg3);border-radius:2px;}
+.bar-fill{height:4px;border-radius:2px;}
+.streak-wrap{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:20px;}
+.streak-dot{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;}
+.chart-wrap{position:relative;width:100%;margin-bottom:20px;}
+.legend{display:flex;gap:16px;margin-bottom:10px;}
+.legend-item{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--text3);}
+.legend-dot{width:8px;height:8px;border-radius:50%;}
+.empty{text-align:center;padding:40px 20px;color:var(--text3);font-size:14px;line-height:1.6;}
+.divider{border:none;border-top:0.5px solid var(--border);margin:20px 0;}
+.debug{font-size:11px;color:var(--text3);margin-bottom:10px;}
+.toast{position:fixed;bottom:32px;left:50%;transform:translateX(-50%);background:var(--text);color:var(--bg);padding:10px 22px;border-radius:22px;font-size:13px;font-weight:500;opacity:0;transition:opacity 0.2s;pointer-events:none;z-index:999;white-space:nowrap;}
+.toast.show{opacity:1;}
+
+/* Chat styles */
+#view-chat{display:none;flex-direction:column;padding:0;height:calc(100vh - 97px);}
+#view-chat.active{display:flex;}
+.chat-context{background:var(--bg2);border-bottom:0.5px solid var(--border);padding:10px 16px;font-size:11px;color:var(--text3);line-height:1.5;}
+.chat-messages{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:12px;}
+.msg{max-width:88%;padding:10px 14px;border-radius:14px;font-size:14px;line-height:1.6;}
+.msg.user{align-self:flex-end;background:var(--text);color:var(--bg);border-bottom-right-radius:4px;}
+.msg.assistant{align-self:flex-start;background:var(--bg2);color:var(--text);border-bottom-left-radius:4px;border:0.5px solid var(--border);}
+.msg.thinking{align-self:flex-start;background:var(--bg2);color:var(--text3);border:0.5px solid var(--border);border-bottom-left-radius:4px;font-style:italic;font-size:13px;}
+.chat-input-area{padding:12px 16px;border-top:0.5px solid var(--border);display:flex;gap:8px;align-items:flex-end;background:var(--bg);}
+.chat-input-area textarea{flex:1;padding:10px 14px;font-size:15px;font-family:inherit;border:0.5px solid var(--border);border-radius:20px;background:var(--bg2);color:var(--text);outline:none;resize:none;max-height:100px;line-height:1.4;}
+.chat-input-area textarea:focus{border-color:var(--text);background:var(--bg);}
+.send-btn{width:38px;height:38px;border-radius:50%;background:var(--text);color:var(--bg);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:16px;transition:opacity 0.15s;}
+.send-btn:active{opacity:0.7;}
+.send-btn:disabled{opacity:0.3;}
+.chat-quick{display:flex;gap:6px;padding:8px 16px 0;flex-wrap:wrap;}
+.quick-btn{padding:6px 12px;font-size:12px;border-radius:16px;border:0.5px solid var(--border);background:var(--bg2);color:var(--text2);cursor:pointer;font-family:inherit;white-space:nowrap;}
+.quick-btn:active{opacity:0.6;}
 </style>
 </head>
 <body>
@@ -107,8 +117,10 @@ input[type=date] { font-size: 15px; font-weight: 400; }
   <button onclick="showView('trends',this)">Trends</button>
   <button onclick="showView('races',this)">Races</button>
   <button onclick="showView('log',this)">Log</button>
+  <button onclick="showView('chat',this)">Chat</button>
 </div>
 
+<!-- CHECK-IN -->
 <div id="view-checkin" class="view active">
   <div class="section-title">Today's numbers</div>
   <div class="input-grid">
@@ -137,32 +149,13 @@ input[type=date] { font-size: 15px; font-weight: 400; }
       <div class="input-hint">1 easy — 10 max</div>
     </div>
   </div>
-
   <div id="warn-area"></div>
-
   <div class="metric-grid">
-    <div class="metric-card">
-      <div class="metric-label">HRV vs baseline</div>
-      <div class="metric-value" id="m-delta">—</div>
-      <div class="metric-sub">62 baseline</div>
-    </div>
-    <div class="metric-card">
-      <div class="metric-label">Load zone</div>
-      <div class="metric-value" id="m-zone">—</div>
-      <div class="metric-sub" id="m-zone-sub">—</div>
-    </div>
-    <div class="metric-card">
-      <div class="metric-label">7-day trend</div>
-      <div class="metric-value" id="m-trend">—</div>
-      <div class="metric-sub" id="m-trend-sub">need 3+ days</div>
-    </div>
-    <div class="metric-card">
-      <div class="metric-label">Days above 1.0</div>
-      <div class="metric-value" id="m-consec">—</div>
-      <div class="metric-sub" id="m-consec-sub">consecutive</div>
-    </div>
+    <div class="metric-card"><div class="metric-label">HRV vs baseline</div><div class="metric-value" id="m-delta">—</div><div class="metric-sub">62 baseline</div></div>
+    <div class="metric-card"><div class="metric-label">Load zone</div><div class="metric-value" id="m-zone">—</div><div class="metric-sub" id="m-zone-sub">—</div></div>
+    <div class="metric-card"><div class="metric-label">7-day trend</div><div class="metric-value" id="m-trend">—</div><div class="metric-sub" id="m-trend-sub">need 3+ days</div></div>
+    <div class="metric-card"><div class="metric-label">Days above 1.0</div><div class="metric-value" id="m-consec">—</div><div class="metric-sub" id="m-consec-sub">consecutive</div></div>
   </div>
-
   <div class="status-card">
     <div class="status-header">
       <div class="status-dot" id="s-dot" style="background:var(--gray);"></div>
@@ -170,10 +163,10 @@ input[type=date] { font-size: 15px; font-weight: 400; }
     </div>
     <div class="status-text" id="s-text">Fill in today's HRV, load, and ratio to get your daily read.</div>
   </div>
-
   <button class="btn primary" onclick="saveEntry()">Save today's entry</button>
 </div>
 
+<!-- TRENDS -->
 <div id="view-trends" class="view">
   <div class="section-title">Last 14 days</div>
   <div class="streak-wrap" id="streak-dots"></div>
@@ -193,11 +186,13 @@ input[type=date] { font-size: 15px; font-weight: 400; }
   <div id="trend-insights"></div>
 </div>
 
+<!-- RACES -->
 <div id="view-races" class="view">
   <div class="section-title">2026 Race calendar</div>
   <div id="race-cards"></div>
 </div>
 
+<!-- LOG -->
 <div id="view-log" class="view">
   <div class="section-title">Entry log</div>
   <div class="debug" id="log-debug"></div>
@@ -206,11 +201,30 @@ input[type=date] { font-size: 15px; font-weight: 400; }
   <button class="btn danger" onclick="clearAll()">Clear all data</button>
 </div>
 
+<!-- CHAT -->
+<div id="view-chat" class="view">
+  <div class="chat-context" id="chat-context">Log today's numbers first to give me full context.</div>
+  <div class="chat-quick">
+    <button class="quick-btn" onclick="quickSend('What should I do today?')">Today's plan</button>
+    <button class="quick-btn" onclick="quickSend('How is my trend looking?')">Trend check</button>
+    <button class="quick-btn" onclick="quickSend('Am I on track for my marathon?')">Marathon ready?</button>
+    <button class="quick-btn" onclick="quickSend('Am I on track for Ironman?')">Ironman ready?</button>
+  </div>
+  <div class="chat-messages" id="chat-messages">
+    <div class="msg assistant">Hi — I'm your training sidekick. Log today's numbers in Check-in, then come ask me anything. I know your full context: thalassemia minor, marathon May 10, Ironman August, LTHR 181, baseline HRV 62.</div>
+  </div>
+  <div class="chat-input-area">
+    <textarea id="chat-input" placeholder="Ask anything..." rows="1" onkeydown="handleKey(event)" oninput="autoResize(this)"></textarea>
+    <button class="send-btn" id="send-btn" onclick="sendMessage()">&#8593;</button>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <script>
 const BASELINE=62, KEY='sidekick-pwa-v1';
+const API_KEY='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';
 const RACES=[
   {name:'CPH Marathon',date:'2026-05-10',type:'marathon',goal:'Sub 3:00'},
   {name:'Sprint Triathlon',date:'2026-06-06',type:'sprint',goal:'Race sharp'},
@@ -218,6 +232,7 @@ const RACES=[
   {name:'Ironman Full',date:'2026-08-16',type:'ironman',goal:'A race — finish strong'}
 ];
 let _e=null, hC=null, rC=null;
+let chatHistory=[];
 
 function load(){if(_e!==null)return _e;try{_e=JSON.parse(localStorage.getItem(KEY)||'[]');}catch(e){_e=[];}return _e;}
 function persist(e){_e=e;try{localStorage.setItem(KEY,JSON.stringify(e));return true;}catch(e){return false;}}
@@ -242,7 +257,7 @@ function analyze(entries){
   return{t7,consec,warns,ah,ar,red};
 }
 
-function status(hrv,ratio,rpe,a){
+function getStatus(hrv,ratio,rpe,a){
   const d=hrv-BASELINE,{consec}=a;
   if(ratio>1.3&&hrv<BASELINE-5)return{c:'#E24B4A',ti:'Red — stop and recover',tx:`HRV ${Math.abs(d)} below baseline with danger-zone load. This is the winter pattern. Full rest — thalassemia minor means your recovery ceiling is lower than it looks.`};
   if(ratio>1.3||hrv<BASELINE-8)return{c:'#E24B4A',ti:'Red — recovery day',tx:`${ratio>1.3?'Load ratio above 1.3.':'HRV significantly suppressed.'} Easy swim or full rest only.`};
@@ -259,13 +274,71 @@ function raceRec(race,a){
   if(!a.ah)return'Log more entries to get personalised recommendations.';
   const hOk=a.ah>=BASELINE-3,lOk=a.ar<=1.1;
   if(race.type==='marathon'){if(days>14)return`${days} days out. ${hOk&&lOk?'HRV and load looking good — stay the course.':'Watch load carefully to arrive at taper healthy.'}`;return`Taper window. ${hOk?'HRV responding well — protect it.':'HRV below baseline — add a rest day.'} Target 70+ HRV race week.`;}
-  if(race.type==='ironman'){if(days>60)return`${days} days out. Build bike after marathon recovery. Ramp test before heavy bike block.`;if(days>21)return`${days} days out. ${lOk?'Load manageable.':'Load creeping high — protect the run legs.'} Dial in nutrition now.`;return`${days} days — taper. HRV ${hOk?'stable':'suppressed'}. ${hOk?'Trust the taper.':'Add a rest day immediately.'}`;}
+  if(race.type==='ironman'){if(days>60)return`${days} days out. Build bike after marathon recovery. Ramp test before heavy bike block.`;if(days>21)return`${days} days out. ${lOk?'Load manageable.':'Load creeping high — protect run legs.'} Dial in nutrition now.`;return`${days} days — taper. HRV ${hOk?'stable':'suppressed'}. ${hOk?'Trust the taper.':'Add a rest day immediately.'}`;}
   if(race.type==='70.3')return`${days} days out. Fitness check not A race. Ratio at or below 0.9 this week.`;
   if(race.type==='sprint')return`${days} days out. One quality session then rest. Arrive fresh.`;
   return`${days} days out. ${hOk&&lOk?'Looking good.':'Monitor load closely.'}`;
 }
 
 function inputs(){return{hrv:parseFloat(document.getElementById('f-hrv').value)||0,acute:parseFloat(document.getElementById('f-acute').value)||0,ratio:parseFloat(document.getElementById('f-ratio').value)||0,rpe:parseFloat(document.getElementById('f-rpe').value)||0};}
+
+function buildSystemPrompt(){
+  const entries=load(),a=analyze(entries);
+  const recent=entries.slice(-7).map(e=>`${e.date}: HRV ${e.hrv}, ratio ${e.ratio.toFixed(2)}, RPE ${e.rpe}`).join(' | ');
+  const {hrv,acute,ratio,rpe}=inputs();
+  return `You are a personal training sidekick for an endurance athlete. Be direct, specific, and concise. No fluff.
+
+ATHLETE PROFILE:
+- Age: 32, Vietnamese origin, living in Denmark
+- Weight: 58kg, Height: 171cm
+- Condition: Thalassemia minor (--αα) — slightly reduced oxygen carrying capacity, needs more recovery than average
+- LTHR: 181 bpm
+- Background: Started running Feb 2024, no prior endurance background
+
+RACE HISTORY:
+- Sep 2024: Half marathon 1:45
+- Apr 2025: Berlin Half 1:28
+- Jun 2025: Ironman 70.3 Elsinore 5:53
+- May 2025: CPH Marathon 3:03
+- Apr 2026: CPH Half 1:26
+
+2026 RACE CALENDAR:
+- May 10: CPH Marathon (goal: sub 3:00) — ${daysUntil('2026-05-10')} days away
+- Jun 6: Sprint Triathlon — ${daysUntil('2026-06-06')} days away
+- Jun 21: 70.3 Triathlon — ${daysUntil('2026-06-21')} days away
+- Aug 16: Ironman Full (A race) — ${daysUntil('2026-08-16')} days away
+
+HRV BASELINE: 62. Winter was low 50s. Current block mid 60s–70.
+LOAD RATIO NORMAL RANGE: 0.8–1.2. Above 1.3 = danger zone.
+FATIGUE HISTORY: Went into deep fatigue twice in winter 2025/26 by training too hard in off-season.
+
+TODAY'S METRICS:
+- HRV: ${hrv||'not logged'} (baseline 62)
+- Acute load: ${acute||'not logged'}
+- Load ratio: ${ratio||'not logged'}
+- Yesterday RPE: ${rpe||'not logged'}
+
+RECENT 7-DAY LOG:
+${recent||'No entries yet'}
+
+TREND ANALYSIS:
+- 7-day HRV trend: ${a.t7!==null?(a.t7>=0?'+':'')+a.t7+' pts':'insufficient data'}
+- Consecutive days above 1.0 ratio: ${a.consec}
+- Avg HRV (7d): ${a.ah?Math.round(a.ah):'—'}
+- Avg ratio (7d): ${a.ar?a.ar.toFixed(2):'—'}
+${a.warns.length?'ACTIVE WARNINGS: '+a.warns.map(w=>w.t).join(' | '):'No active trend warnings.'}
+
+MARATHON CONTEXT (May 10):
+- Last long run: 30km with 10km at 4:21 (negative split 4:34→4:09)
+- Threshold pace: 3:55–4:03/km
+- Race goal pace: 4:15/km (sub 3:00)
+- Fueling plan: Maurten Gel 160, every 25 min, 7 gels total (~96g/hr)
+- Last year: faded at km 37 due to under-fueling (went through halfway in 1:30)
+- Dress rehearsal: 32km on Apr 25 with 12km at race pace
+- Taper: 2 weeks prior to race
+
+Keep responses conversational and under 150 words unless asked for detail. Always be honest, not just reassuring.`;
+}
 
 function updateCheckin(){
   const{hrv,ratio,rpe}=inputs();
@@ -274,18 +347,27 @@ function updateCheckin(){
   document.getElementById('m-delta').textContent=(delta>=0?'+':'')+delta;
   document.getElementById('m-delta').style.color=delta>=3?'#1D9E75':delta<=-5?'#E24B4A':'var(--text)';
   const z=zone(ratio);
-  document.getElementById('m-zone').textContent=z.l;
-  document.getElementById('m-zone-sub').textContent=z.s;
-  document.getElementById('m-consec').textContent=a.consec;
-  document.getElementById('m-consec-sub').textContent=a.consec>=3?'watch this':a.consec===0?'none':'days';
+  document.getElementById('m-zone').textContent=z.l;document.getElementById('m-zone-sub').textContent=z.s;
+  document.getElementById('m-consec').textContent=a.consec;document.getElementById('m-consec-sub').textContent=a.consec>=3?'watch this':a.consec===0?'none':'days';
   if(a.t7!==null){document.getElementById('m-trend').textContent=(a.t7>=0?'+':'')+a.t7;document.getElementById('m-trend-sub').textContent=a.t7>=2?'improving':a.t7<=-2?'declining':'stable';}
-  const st=status(hrv,ratio,rpe,a);
-  document.getElementById('s-dot').style.background=st.c;
-  document.getElementById('s-title').textContent=st.ti;
-  document.getElementById('s-text').textContent=st.tx;
+  const st=getStatus(hrv,ratio,rpe,a);
+  document.getElementById('s-dot').style.background=st.c;document.getElementById('s-title').textContent=st.ti;document.getElementById('s-text').textContent=st.tx;
   document.getElementById('top-dot').style.background=st.c;
   document.getElementById('top-sub').textContent=`${entries.length} entr${entries.length===1?'y':'ies'} · ${new Date().toLocaleDateString('en-DK',{month:'short',day:'numeric'})}`;
   document.getElementById('warn-area').innerHTML=a.warns.map(w=>{const r=w.l==='red';return`<div class="warn-box" style="background:${r?'rgba(226,75,74,0.08)':'rgba(239,159,39,0.08)'};border-color:${r?'rgba(226,75,74,0.3)':'rgba(239,159,39,0.3)'};color:${r?'#993C1D':'#854F0B'};">Trend alert — ${w.t}</div>`;}).join('');
+  updateChatContext();
+}
+
+function updateChatContext(){
+  const{hrv,ratio,rpe}=inputs();
+  const entries=load(),a=analyze(entries);
+  const ctx=document.getElementById('chat-context');
+  if(hrv&&ratio){
+    const st=getStatus(hrv,ratio,rpe,a);
+    ctx.innerHTML=`Today: HRV <strong>${hrv}</strong> (${hrv-BASELINE>=0?'+':''}${hrv-BASELINE} vs baseline) · Ratio <strong>${ratio}</strong> · <span style="color:${st.c};font-weight:600;">${st.ti.split('—')[0].trim()}</span>`;
+  }else{
+    ctx.textContent='Log today\'s numbers in Check-in to give me full context.';
+  }
 }
 
 function renderTrends(){
@@ -323,6 +405,7 @@ function showView(name,btn){
   if(name==='trends')renderTrends();
   if(name==='races')renderRaces();
   if(name==='log')renderLog();
+  if(name==='chat')updateChatContext();
 }
 
 function saveEntry(){
@@ -339,6 +422,75 @@ function saveEntry(){
 
 function clearAll(){
   if(confirm('Clear all stored entries?')){_e=[];localStorage.removeItem(KEY);updateCheckin();renderLog();toast('Cleared');}
+}
+
+function autoResize(el){el.style.height='auto';el.style.height=Math.min(el.scrollHeight,100)+'px';}
+function handleKey(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendMessage();}}
+function quickSend(msg){document.getElementById('chat-input').value=msg;sendMessage();}
+
+function addMessage(role,text){
+  const el=document.getElementById('chat-messages');
+  const div=document.createElement('div');
+  div.className=`msg ${role}`;
+  div.textContent=text;
+  el.appendChild(div);
+  el.scrollTop=el.scrollHeight;
+  return div;
+}
+
+async function sendMessage(){
+  const input=document.getElementById('chat-input');
+  const btn=document.getElementById('send-btn');
+  const text=input.value.trim();
+  if(!text)return;
+
+  input.value='';
+  input.style.height='auto';
+  btn.disabled=true;
+
+  addMessage('user',text);
+  chatHistory.push({role:'user',content:text});
+
+  const thinking=addMessage('thinking','Thinking...');
+
+  try{
+    const res=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{
+        'Content-Type':'application/json',
+        'x-api-key':API_KEY,
+        'anthropic-version':'2023-06-01',
+        'anthropic-dangerous-direct-browser-access':'true'
+      },
+      body:JSON.stringify({
+        model:'claude-haiku-4-5-20251001',
+        max_tokens:400,
+        system:buildSystemPrompt(),
+        messages:chatHistory
+      })
+    });
+
+    const data=await res.json();
+
+    if(data.error){
+      thinking.className='msg assistant';
+      thinking.textContent='Error: '+data.error.message;
+      chatHistory.pop();
+    }else{
+      const reply=data.content[0].text;
+      thinking.className='msg assistant';
+      thinking.textContent=reply;
+      chatHistory.push({role:'assistant',content:reply});
+      if(chatHistory.length>20)chatHistory=chatHistory.slice(-20);
+    }
+  }catch(e){
+    thinking.className='msg assistant';
+    thinking.textContent='Could not reach the API. Check your connection.';
+    chatHistory.pop();
+  }
+
+  btn.disabled=false;
+  document.getElementById('chat-messages').scrollTop=document.getElementById('chat-messages').scrollHeight;
 }
 
 document.getElementById('entry-date').value=new Date().toISOString().split('T')[0];
