@@ -203,19 +203,29 @@ input[type=date]{font-size:15px;font-weight:400;}
 
 <!-- CHAT -->
 <div id="view-chat" class="view">
-  <div class="chat-context" id="chat-context">Log today's numbers first to give me full context.</div>
-  <div class="chat-quick">
-    <button class="quick-btn" onclick="quickSend('What should I do today?')">Today's plan</button>
-    <button class="quick-btn" onclick="quickSend('How is my trend looking?')">Trend check</button>
-    <button class="quick-btn" onclick="quickSend('Am I on track for my marathon?')">Marathon ready?</button>
-    <button class="quick-btn" onclick="quickSend('Am I on track for Ironman?')">Ironman ready?</button>
+  <div id="chat-setup" style="display:none;padding:20px;">
+    <div class="section-title">API key setup</div>
+    <p style="font-size:14px;color:var(--text2);line-height:1.6;margin-bottom:20px;">To use the Chat tab you need an Anthropic API key. It's stored only on this device — never in the code or on GitHub.</p>
+    <div style="font-size:13px;color:var(--text3);margin-bottom:8px;">Get your key at console.anthropic.com → API Keys → Create Key</div>
+    <input type="text" id="api-key-input" placeholder="sk-ant-api03-..." style="width:100%;padding:12px 14px;font-size:13px;font-family:inherit;border:0.5px solid var(--border);border-radius:var(--radius);background:var(--bg2);color:var(--text);outline:none;margin-bottom:12px;">
+    <button class="btn primary" onclick="submitApiKey()">Save key and start chatting</button>
   </div>
-  <div class="chat-messages" id="chat-messages">
-    <div class="msg assistant">Hi — I'm your training sidekick. Log today's numbers in Check-in, then come ask me anything. I know your full context: thalassemia minor, marathon May 10, Ironman August, LTHR 181, baseline HRV 62.</div>
-  </div>
-  <div class="chat-input-area">
-    <textarea id="chat-input" placeholder="Ask anything..." rows="1" onkeydown="handleKey(event)" oninput="autoResize(this)"></textarea>
-    <button class="send-btn" id="send-btn" onclick="sendMessage()">&#8593;</button>
+  <div id="chat-main" style="display:none;flex-direction:column;height:calc(100vh - 97px);">
+    <div class="chat-context" id="chat-context">Log today's numbers first to give me full context.</div>
+    <div class="chat-quick">
+      <button class="quick-btn" onclick="quickSend('What should I do today?')">Today's plan</button>
+      <button class="quick-btn" onclick="quickSend('How is my trend looking?')">Trend check</button>
+      <button class="quick-btn" onclick="quickSend('Am I on track for my marathon?')">Marathon ready?</button>
+      <button class="quick-btn" onclick="quickSend('Am I on track for Ironman?')">Ironman ready?</button>
+    </div>
+    <div class="chat-messages" id="chat-messages">
+      <div class="msg assistant">Hi — I'm your training sidekick. I know your full context: thalassemia minor, marathon May 10, Ironman August, LTHR 181. Ask me anything.</div>
+    </div>
+    <div class="chat-input-area">
+      <textarea id="chat-input" placeholder="Ask anything..." rows="1" onkeydown="handleKey(event)" oninput="autoResize(this)"></textarea>
+      <button class="send-btn" id="send-btn" onclick="sendMessage()">&#8593;</button>
+    </div>
+    <div style="text-align:center;padding:8px;"><button onclick="resetApiKey()" style="font-size:11px;color:var(--text3);background:none;border:none;cursor:pointer;">Change API key</button></div>
   </div>
 </div>
 
@@ -229,8 +239,8 @@ function getBaseline(entries){
   const r30=entries.slice(-30);
   return Math.round(r30.reduce((a,b)=>a+b.hrv,0)/r30.length);
 }
-const API_KEY='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';
-const RACES=[
+function getApiKey(){return localStorage.getItem('sidekick-api-key')||'';}
+function saveApiKey(k){localStorage.setItem('sidekick-api-key',k.trim());}const RACES=[
   {name:'CPH Marathon',date:'2026-05-10',type:'marathon',goal:'Sub 3:00'},
   {name:'Sprint Triathlon',date:'2026-06-06',type:'sprint',goal:'Race sharp'},
   {name:'70.3 Triathlon',date:'2026-06-21',type:'70.3',goal:'Fitness check'},
@@ -415,7 +425,7 @@ function showView(name,btn){
   if(name==='trends')renderTrends();
   if(name==='races')renderRaces();
   if(name==='log')renderLog();
-  if(name==='chat')updateChatContext();
+  if(name==='chat')showChatView();
 }
 
 function saveEntry(){
@@ -434,6 +444,24 @@ function clearAll(){
   if(confirm('Clear all stored entries?')){_e=[];localStorage.removeItem(KEY);updateCheckin();renderLog();toast('Cleared');}
 }
 
+function showChatView(){
+  const hasKey = getApiKey().length > 0;
+  document.getElementById('chat-setup').style.display = hasKey ? 'none' : 'block';
+  document.getElementById('chat-main').style.display = hasKey ? 'flex' : 'none';
+  if(hasKey) updateChatContext();
+}
+function submitApiKey(){
+  const val = document.getElementById('api-key-input').value.trim();
+  if(!val.startsWith('sk-ant')){toast('Key should start with sk-ant...');return;}
+  saveApiKey(val);
+  showChatView();
+  toast('Key saved');
+}
+function resetApiKey(){
+  localStorage.removeItem('sidekick-api-key');
+  document.getElementById('api-key-input').value='';
+  showChatView();
+}
 function autoResize(el){el.style.height='auto';el.style.height=Math.min(el.scrollHeight,100)+'px';}
 function handleKey(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendMessage();}}
 function quickSend(msg){document.getElementById('chat-input').value=msg;sendMessage();}
@@ -468,7 +496,7 @@ async function sendMessage(){
       method:'POST',
       headers:{
         'Content-Type':'application/json',
-        'x-api-key':API_KEY,
+        'x-api-key':getApiKey(),
         'anthropic-version':'2023-06-01',
         'anthropic-dangerous-direct-browser-access':'true'
       },
