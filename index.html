@@ -223,8 +223,13 @@ input[type=date]{font-size:15px;font-weight:400;}
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <script>
-const BASELINE=62, KEY='sidekick-pwa-v1';
-const API_KEY='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';
+const DEFAULT_BASELINE=64, KEY='sidekick-pwa-v1';
+function getBaseline(entries){
+  if(!entries||entries.length<7)return DEFAULT_BASELINE;
+  const r30=entries.slice(-30);
+  return Math.round(r30.reduce((a,b)=>a+b.hrv,0)/r30.length);
+}
+const API_KEY='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';
 const RACES=[
   {name:'CPH Marathon',date:'2026-05-10',type:'marathon',goal:'Sub 3:00'},
   {name:'Sprint Triathlon',date:'2026-06-06',type:'sprint',goal:'Race sharp'},
@@ -238,15 +243,16 @@ function load(){if(_e!==null)return _e;try{_e=JSON.parse(localStorage.getItem(KE
 function persist(e){_e=e;try{localStorage.setItem(KEY,JSON.stringify(e));return true;}catch(e){return false;}}
 function toast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2000);}
 function daysUntil(d){const n=new Date();n.setHours(0,0,0,0);const t=new Date(d);t.setHours(0,0,0,0);return Math.round((t-n)/86400000);}
-function dc(h,r){if(r>1.3||h<BASELINE-8)return'#E24B4A';if(r>1.0||h<BASELINE-3)return'#EF9F27';return'#1D9E75';}
+function dc(h,r,bl){const b=bl||DEFAULT_BASELINE;if(r>1.3||h<b-8)return'#E24B4A';if(r>1.0||h<b-3)return'#EF9F27';return'#1D9E75';}
 function zone(r){if(r<0.8)return{l:'Under',s:'below 0.8'};if(r<=1.0)return{l:'Optimal',s:'0.8–1.0'};if(r<=1.3)return{l:'High',s:'monitor'};return{l:'Danger',s:'above 1.3'};}
 
 function analyze(entries){
-  if(!entries.length)return{t7:null,consec:0,warns:[],ah:null,ar:null,red:0};
+  if(!entries.length)return{t7:null,consec:0,warns:[],ah:null,ar:null,red:0,baseline:DEFAULT_BASELINE};
+  const bl=getBaseline(entries);
   const r7=entries.slice(-7);
   const ah=r7.reduce((a,b)=>a+b.hrv,0)/r7.length;
   const ar=r7.reduce((a,b)=>a+b.ratio,0)/r7.length;
-  const red=entries.filter(e=>dc(e.hrv,e.ratio)==='#E24B4A').length;
+  const red=entries.filter(e=>dc(e.hrv,e.ratio,bl)==='#E24B4A').length;
   let t7=null;
   if(entries.length>=4){const h=r7.map(e=>e.hrv),half=Math.floor(h.length/2),a1=h.slice(0,half).reduce((a,b)=>a+b,0)/half,a2=h.slice(half).reduce((a,b)=>a+b,0)/(h.length-half);t7=Math.round((a2-a1)*10)/10;}
   let consec=0;for(let i=entries.length-1;i>=0;i--){if(entries[i].ratio>1.0)consec++;else break;}
@@ -254,16 +260,17 @@ function analyze(entries){
   if(consec>=5)warns.push({l:'red',t:`Load above 1.0 for ${consec} consecutive days — winter pattern. Force recovery today.`});
   else if(consec>=3&&t7!==null&&t7<-3)warns.push({l:'amber',t:`${consec} days above 1.0 with HRV declining ${Math.abs(t7)} pts. Reduce intensity this week.`});
   if(t7!==null&&t7<-5)warns.push({l:'amber',t:`HRV down ${Math.abs(t7)} pts over 7 days. Trend matters more than today's number.`});
-  return{t7,consec,warns,ah,ar,red};
+  return{t7,consec,warns,ah,ar,red,baseline:bl};
 }
 
 function getStatus(hrv,ratio,rpe,a){
-  const d=hrv-BASELINE,{consec}=a;
-  if(ratio>1.3&&hrv<BASELINE-5)return{c:'#E24B4A',ti:'Red — stop and recover',tx:`HRV ${Math.abs(d)} below baseline with danger-zone load. This is the winter pattern. Full rest — thalassemia minor means your recovery ceiling is lower than it looks.`};
-  if(ratio>1.3||hrv<BASELINE-8)return{c:'#E24B4A',ti:'Red — recovery day',tx:`${ratio>1.3?'Load ratio above 1.3.':'HRV significantly suppressed.'} Easy swim or full rest only.`};
+  const bl=a.baseline||DEFAULT_BASELINE;
+  const d=hrv-bl,{consec}=a;
+  if(ratio>1.3&&hrv<bl-5)return{c:'#E24B4A',ti:'Red — stop and recover',tx:`HRV ${Math.abs(d)} below baseline with danger-zone load. This is the winter pattern. Full rest — thalassemia minor means your recovery ceiling is lower than it looks.`};
+  if(ratio>1.3||hrv<bl-8)return{c:'#E24B4A',ti:'Red — recovery day',tx:`${ratio>1.3?'Load ratio above 1.3.':'HRV significantly suppressed.'} Easy swim or full rest only.`};
   if(consec>=5)return{c:'#E24B4A',ti:'Red — trend is the problem',tx:`Today looks okay but ${consec} consecutive days above 1.0. That slow accumulation is how winter happened. Rest today.`};
-  if(ratio>1.0&&hrv<BASELINE)return{c:'#EF9F27',ti:'Amber — reduce load',tx:'Load above optimal and HRV below baseline. Drop intensity, not volume.'};
-  if(ratio>1.0||hrv<BASELINE-3)return{c:'#EF9F27',ti:'Amber — monitor today',tx:`${ratio>1.0?'Load above optimal.':'HRV slightly below baseline.'} ${rpe>=8?'Yesterday was hard — make today easy.':'Execute as planned but watch tomorrow.'}`};
+  if(ratio>1.0&&hrv<bl)return{c:'#EF9F27',ti:'Amber — reduce load',tx:'Load above optimal and HRV below baseline. Drop intensity, not volume.'};
+  if(ratio>1.0||hrv<bl-3)return{c:'#EF9F27',ti:'Amber — monitor today',tx:`${ratio>1.0?'Load above optimal.':'HRV slightly below baseline.'} ${rpe>=8?'Yesterday was hard — make today easy.':'Execute as planned but watch tomorrow.'}`};
   if(d>=5&&ratio<=1.0)return{c:'#1D9E75',ti:'Green — optimal window',tx:`HRV ${d} above baseline, load optimal. Body absorbing training well. Execute with confidence.`};
   return{c:'#1D9E75',ti:'Green — go train',tx:`No flags. ${rpe>=8?'Yesterday was tough — keep today controlled even if you feel good.':'Execute as planned.'}`};
 }
@@ -272,7 +279,8 @@ function raceRec(race,a){
   const days=daysUntil(race.date);
   if(days<0)return'Race completed.';
   if(!a.ah)return'Log more entries to get personalised recommendations.';
-  const hOk=a.ah>=BASELINE-3,lOk=a.ar<=1.1;
+  const bl=a.baseline||DEFAULT_BASELINE;
+  const hOk=a.ah>=bl-3,lOk=a.ar<=1.1;
   if(race.type==='marathon'){if(days>14)return`${days} days out. ${hOk&&lOk?'HRV and load looking good — stay the course.':'Watch load carefully to arrive at taper healthy.'}`;return`Taper window. ${hOk?'HRV responding well — protect it.':'HRV below baseline — add a rest day.'} Target 70+ HRV race week.`;}
   if(race.type==='ironman'){if(days>60)return`${days} days out. Build bike after marathon recovery. Ramp test before heavy bike block.`;if(days>21)return`${days} days out. ${lOk?'Load manageable.':'Load creeping high — protect run legs.'} Dial in nutrition now.`;return`${days} days — taper. HRV ${hOk?'stable':'suppressed'}. ${hOk?'Trust the taper.':'Add a rest day immediately.'}`;}
   if(race.type==='70.3')return`${days} days out. Fitness check not A race. Ratio at or below 0.9 this week.`;
@@ -308,7 +316,7 @@ RACE HISTORY:
 - Jun 21: 70.3 Triathlon — ${daysUntil('2026-06-21')} days away
 - Aug 16: Ironman Full (A race) — ${daysUntil('2026-08-16')} days away
 
-HRV BASELINE: 62. Winter was low 50s. Current block mid 60s–70.
+HRV BASELINE: ${getBaseline(entries)} (rolling 30-day average, default 64). Winter was low 50s. Current block mid 60s–70. Personal range 57-72.
 LOAD RATIO NORMAL RANGE: 0.8–1.2. Above 1.3 = danger zone.
 FATIGUE HISTORY: Went into deep fatigue twice in winter 2025/26 by training too hard in off-season.
 
@@ -343,9 +351,10 @@ Keep responses conversational and under 150 words unless asked for detail. Alway
 function updateCheckin(){
   const{hrv,ratio,rpe}=inputs();
   if(!hrv||!ratio)return;
-  const entries=load(),a=analyze(entries),delta=hrv-BASELINE;
+  const entries=load(),a=analyze(entries),bl=a.baseline,delta=hrv-bl;
   document.getElementById('m-delta').textContent=(delta>=0?'+':'')+delta;
   document.getElementById('m-delta').style.color=delta>=3?'#1D9E75':delta<=-5?'#E24B4A':'var(--text)';
+  document.querySelector('#view-checkin .metric-card .metric-sub').textContent=`${bl} baseline`;
   const z=zone(ratio);
   document.getElementById('m-zone').textContent=z.l;document.getElementById('m-zone-sub').textContent=z.s;
   document.getElementById('m-consec').textContent=a.consec;document.getElementById('m-consec-sub').textContent=a.consec>=3?'watch this':a.consec===0?'none':'days';
@@ -360,11 +369,11 @@ function updateCheckin(){
 
 function updateChatContext(){
   const{hrv,ratio,rpe}=inputs();
-  const entries=load(),a=analyze(entries);
+  const entries=load(),a=analyze(entries),bl=a.baseline;
   const ctx=document.getElementById('chat-context');
   if(hrv&&ratio){
     const st=getStatus(hrv,ratio,rpe,a);
-    ctx.innerHTML=`Today: HRV <strong>${hrv}</strong> (${hrv-BASELINE>=0?'+':''}${hrv-BASELINE} vs baseline) · Ratio <strong>${ratio}</strong> · <span style="color:${st.c};font-weight:600;">${st.ti.split('—')[0].trim()}</span>`;
+    ctx.innerHTML=`Today: HRV <strong>${hrv}</strong> (${hrv-bl>=0?'+':''}${hrv-bl} vs baseline ${bl}) · Ratio <strong>${ratio}</strong> · <span style="color:${st.c};font-weight:600;">${st.ti.split('—')[0].trim()}</span>`;
   }else{
     ctx.textContent='Log today\'s numbers in Check-in to give me full context.';
   }
@@ -373,14 +382,15 @@ function updateChatContext(){
 function renderTrends(){
   const entries=load(),a=analyze(entries),r30=entries.slice(-30);
   document.getElementById('streak-dots').innerHTML=entries.slice(-14).map(e=>{const c=dc(e.hrv,e.ratio),d=new Date(e.date),day=d.toLocaleDateString('en-DK',{weekday:'short'}).slice(0,2);return`<div class="streak-dot" style="background:${c}22;color:${c};border:1.5px solid ${c};">${day}</div>`;}).join('');
-  if(a.ah){document.getElementById('t-hrv').textContent=Math.round(a.ah);document.getElementById('t-hrv-sub').textContent=a.ah>=BASELINE?'above baseline':'below baseline';document.getElementById('t-ratio').textContent=a.ar.toFixed(2);document.getElementById('t-ratio-sub').textContent=a.ar<=1.0?'optimal':'above optimal';document.getElementById('t-red').textContent=a.red;}
+  if(a.ah){document.getElementById('t-hrv').textContent=Math.round(a.ah);document.getElementById('t-hrv-sub').textContent=a.ah>=a.baseline?'above baseline':'below baseline';document.getElementById('t-ratio').textContent=a.ar.toFixed(2);document.getElementById('t-ratio-sub').textContent=a.ar<=1.0?'optimal':'above optimal';document.getElementById('t-red').textContent=a.red;}
   if(a.t7!==null)document.getElementById('t-dir').textContent=(a.t7>=0?'+':'')+a.t7;
   const ins=document.getElementById('trend-insights');
   ins.innerHTML=a.warns.length?a.warns.map(w=>{const r=w.l==='red';return`<div class="warn-box" style="background:${r?'rgba(226,75,74,0.08)':'rgba(239,159,39,0.08)'};border-color:${r?'rgba(226,75,74,0.3)':'rgba(239,159,39,0.3)'};color:${r?'#993C1D':'#854F0B'};">${w.t}</div>`;}).join(''):entries.length>=3?`<div class="warn-box" style="background:rgba(29,158,117,0.08);border-color:rgba(29,158,117,0.3);color:#0F6E56;">No trend warnings. Keep logging daily.</div>`:`<div class="empty">Log at least 3 days to see trend analysis.</div>`;
   if(hC){hC.destroy();hC=null;}if(rC){rC.destroy();rC=null;}
   if(r30.length>=2){
-    const labels=r30.map(e=>new Date(e.date).toLocaleDateString('en-DK',{month:'short',day:'numeric'})),hd=r30.map(e=>e.hrv),rd=r30.map(e=>e.ratio),dcs=r30.map(e=>dc(e.hrv,e.ratio));
-    hC=new Chart(document.getElementById('hrv-chart').getContext('2d'),{type:'line',data:{labels,datasets:[{label:'HRV',data:hd,borderColor:'#1D9E75',backgroundColor:'rgba(29,158,117,0.07)',borderWidth:2,pointBackgroundColor:dcs,pointRadius:4,tension:0.3,fill:true},{label:'Baseline',data:Array(labels.length).fill(BASELINE),borderColor:'#888780',borderWidth:1,borderDash:[4,4],pointRadius:0}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{maxTicksLimit:5,color:'#888780',font:{size:10}},grid:{display:false}},y:{min:40,max:90,ticks:{color:'#888780',font:{size:10}},grid:{color:'rgba(136,135,128,0.1)'}}}}});
+    const labels=r30.map(e=>new Date(e.date).toLocaleDateString('en-DK',{month:'short',day:'numeric'})),hd=r30.map(e=>e.hrv),rd=r30.map(e=>e.ratio),dcs=r30.map(e=>dc(e.hrv,e.ratio,a.baseline));
+    hC=new Chart(document.getElementById('hrv-chart').getContext('2d'),{type:'line',data:{labels,datasets:[{label:'HRV',data:hd,borderColor:'#1D9E75',backgroundColor:'rgba(29,158,117,0.07)',borderWidth:2,pointBackgroundColor:dcs,pointRadius:4,tension:0.3,fill:true},{label:'Baseline',data:Array(labels.length).fill(a.baseline),borderColor:'#888780',borderWidth:1,borderDash:[4,4],pointRadius:0}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{maxTicksLimit:5,color:'#888780',font:{size:10}},grid:{display:false}},y:{min:40,max:90,ticks:{color:'#888780',font:{size:10}},grid:{color:'rgba(136,135,128,0.1)'}}}}});
+    hC=new Chart(document.getElementById('hrv-chart').getContext('2d'),{type:'line',data:{labels,datasets:[{label:'HRV',data:hd,borderColor:'#1D9E75',backgroundColor:'rgba(29,158,117,0.07)',borderWidth:2,pointBackgroundColor:dcs,pointRadius:4,tension:0.3,fill:true},{label:'Baseline',data:Array(labels.length).fill(a.baseline),borderColor:'#888780',borderWidth:1,borderDash:[4,4],pointRadius:0}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{maxTicksLimit:5,color:'#888780',font:{size:10}},grid:{display:false}},y:{min:40,max:90,ticks:{color:'#888780',font:{size:10}},grid:{color:'rgba(136,135,128,0.1)'}}}}});
     rC=new Chart(document.getElementById('ratio-chart').getContext('2d'),{type:'bar',data:{labels,datasets:[{label:'Ratio',data:rd,backgroundColor:rd.map(r=>r>1.3?'#E24B4A':r>1.0?'#EF9F27':'#1D9E75'),borderRadius:3}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{maxTicksLimit:5,color:'#888780',font:{size:10}},grid:{display:false}},y:{min:0,max:1.8,ticks:{color:'#888780',font:{size:10}},grid:{color:'rgba(136,135,128,0.1)'}}}}});
   }else{document.getElementById('hrv-chart').parentElement.innerHTML='<div class="empty">Log 2+ entries to see charts.</div>';document.getElementById('ratio-chart').parentElement.innerHTML='';}
 }
