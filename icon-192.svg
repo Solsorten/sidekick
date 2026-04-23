@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="192" height="192" viewBox="0 0 192 192">
+  <rect width="192" height="192" rx="40" fill="#1a1a18"/>
+  <circle cx="96" cy="86" r="36" fill="none" stroke="#1D9E75" stroke-width="8"/>
+  <path d="M70 86 Q80 66 96 86 Q112 106 122 86" fill="none" stroke="#1D9E75" stroke-width="6" stroke-linecap="round"/>
+  <circle cx="96" cy="86" r="6" fill="#1D9E75"/>
+  <text x="96" y="148" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="20" font-weight="600" fill="#f0efe9">sidekick</text>
+</svg>
