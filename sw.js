@@ -1,4 +1,4 @@
-const CACHE = 'sidekick-v1';
+const CACHE = 'sidekick-v3';
 const ASSETS = [
   './',
   './index.html',
